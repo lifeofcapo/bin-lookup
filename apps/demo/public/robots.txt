@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lifeofcapo.github.io/bin-lookup/sitemap.xml

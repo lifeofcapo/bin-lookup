@@ -1,6 +1,6 @@
 {
   "name": "bin-lookup",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Offline, zero-dependency BIN/IIN lookup: card network, issuing bank and country from a card number or BIN. Works in Node.js, browsers, React, TypeScript.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -16,8 +16,19 @@
   "files": [
     "dist"
   ],
+  "unpkg": "./dist/index.global.js",
+  "jsdelivr": "./dist/index.global.js",
   "sideEffects": false,
   "license": "MIT",
+  "homepage": "https://lifeofcapo.github.io/bin-lookup/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lifeofcapo/bin-lookup.git",
+    "directory": "packages/bin-lookup"
+  },
+  "bugs": {
+    "url": "https://github.com/lifeofcapo/bin-lookup/issues"
+  },
   "keywords": [
     "bin",
     "iin",
@@ -31,7 +42,7 @@
     "offline"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "build": "tsup src/index.ts --format esm,cjs,iife --global-name BinLookup --dts --clean --minify",
     "build:data": "node scripts/build-data.mjs",
     "pretest": "tsc -p tsconfig.json --outDir .test-dist",
     "test": "node --test .test-dist/*.test.js",

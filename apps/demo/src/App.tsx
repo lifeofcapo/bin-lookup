@@ -1,19 +1,20 @@
 import { useMemo, useState } from "react";
 import { lookup, type LookupResult } from "bin-lookup";
+import { useLanguage } from "./LanguageContext.js";
 
 const EXAMPLES = [
-  { label: "Visa (тест)", value: "4111 1111 1111 1111" },
-  { label: "Mastercard (тест)", value: "5555 5555 5555 4444" },
-  { label: "Amex (тест)", value: "3782 822463 10005" },
-  { label: "Mir (диапазон)", value: "2200 1234 5678 9012" },
-  { label: "Реальный BIN из датасета", value: "341142" },
-];
+  { key: "exampleVisa", value: "4111 1111 1111 1111" },
+  { key: "exampleMastercard", value: "5555 5555 5555 4444" },
+  { key: "exampleAmex", value: "3782 822463 10005" },
+  { key: "exampleMir", value: "2200 1234 5678 9012" },
+  { key: "exampleReal", value: "341142" },
+] as const;
 
 const SCHEME_LABEL: Record<string, string> = {
   visa: "Visa",
   mastercard: "Mastercard",
   amex: "American Express",
-  mir: "Мир",
+  mir: "Mir",
   discover: "Discover",
   jcb: "JCB",
   unionpay: "UnionPay",
@@ -26,21 +27,28 @@ function formatInput(value: string): string {
   return digits.replace(/(\d{4})(?=\d)/g, "$1 ");
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Row({
+  label,
+  value,
+  tag,
+}: {
+  label: string;
+  value: React.ReactNode;
+  tag?: string;
+}) {
   return (
-    <div className="field">
-      <span className="field-label">{label}</span>
-      <span className="field-value">{children}</span>
+    <div className="row">
+      <span className="row-label">{label}</span>
+      <span className="row-value">
+        {value}
+        {tag ? <span className="tag">{tag}</span> : null}
+      </span>
     </div>
   );
 }
 
-function Badge({ ok, children }: { ok: boolean | null; children: React.ReactNode }) {
-  const cls = ok === null ? "badge badge-neutral" : ok ? "badge badge-ok" : "badge badge-bad";
-  return <span className={cls}>{children}</span>;
-}
-
 export default function App() {
+  const { lang, setLang, t } = useLanguage();
   const [raw, setRaw] = useState("4111 1111 1111 1111");
 
   const result: LookupResult | null = useMemo(() => {
@@ -51,16 +59,33 @@ export default function App() {
 
   return (
     <div className="page">
-      <header>
-        <h1>bin-lookup</h1>
-        <p className="subtitle">
-          Офлайн определение банка, страны и платёжной системы по номеру карты / BIN.
-          Без API-ключей, без сетевых запросов — всё считается прямо в браузере.
-        </p>
+      <nav className="topbar">
+        <span className="wordmark">bin-lookup</span>
+        <div className="lang-switch" role="group" aria-label="Language">
+          <button
+            className={lang === "en" ? "lang-active" : ""}
+            onClick={() => setLang("en")}
+            aria-pressed={lang === "en"}
+          >
+            EN
+          </button>
+          <button
+            className={lang === "ru" ? "lang-active" : ""}
+            onClick={() => setLang("ru")}
+            aria-pressed={lang === "ru"}
+          >
+            RU
+          </button>
+        </div>
+      </nav>
+
+      <header className="hero">
+        <h1>{t("title")}</h1>
+        <p className="subtitle">{t("subtitle")}</p>
       </header>
 
-      <main className="card">
-        <label htmlFor="pan">Номер карты или BIN (6–8 первых цифр)</label>
+      <main>
+        <label htmlFor="pan">{t("inputLabel")}</label>
         <input
           id="pan"
           inputMode="numeric"
@@ -68,73 +93,101 @@ export default function App() {
           spellCheck={false}
           value={raw}
           onChange={(e) => setRaw(formatInput(e.target.value))}
-          placeholder="4111 1111 1111 1111"
+          placeholder={t("placeholder")}
         />
 
         <div className="examples">
           {EXAMPLES.map((ex) => (
             <button key={ex.value} onClick={() => setRaw(ex.value)}>
-              {ex.label}
+              {t(ex.key)}
             </button>
           ))}
         </div>
 
         {result ? (
-          <div className="result">
-            <Field label="Платёжная система">
-              {result.scheme ? (
-                <>
-                  {SCHEME_LABEL[result.scheme] ?? result.scheme}{" "}
-                  <Badge ok={result.schemeSource === "range"}>
-                    {result.schemeSource === "range" ? "из датасета" : "по публичному паттерну"}
-                  </Badge>
-                </>
-              ) : (
-                <span className="muted">не определена</span>
-              )}
-            </Field>
-
-            <Field label="Банк-эмитент">
-              {result.bank ?? <span className="muted">нет данных по этому BIN</span>}
-            </Field>
-
-            <Field label="Страна">
-              {result.country ?? <span className="muted">нет данных по этому BIN</span>}
-            </Field>
-
-            <Field label="Тип карты">
-              {result.cardType ?? <span className="muted">нет данных</span>}
-            </Field>
-
-            <Field label="Luhn-валидность">
-              {result.luhnValid === null ? (
-                <span className="muted">слишком короткий номер для проверки</span>
-              ) : (
-                <Badge ok={result.luhnValid}>
-                  {result.luhnValid ? "корректная контрольная сумма" : "контрольная сумма не сходится"}
-                </Badge>
-              )}
-            </Field>
-          </div>
+          <section className="receipt" aria-live="polite">
+            <Row
+              label={t("scheme")}
+              value={
+                result.scheme ? (
+                  (SCHEME_LABEL[result.scheme] ?? result.scheme)
+                ) : (
+                  <span className="muted">{t("notDetermined")}</span>
+                )
+              }
+              tag={
+                result.scheme
+                  ? result.schemeSource === "range"
+                    ? t("fromDataset")
+                    : t("byPattern")
+                  : undefined
+              }
+            />
+            <Row
+              label={t("bank")}
+              value={
+                result.bank ?? (
+                  <span className="muted">{t("noDataForBin")}</span>
+                )
+              }
+            />
+            <Row
+              label={t("country")}
+              value={
+                result.country ?? (
+                  <span className="muted">{t("noDataForBin")}</span>
+                )
+              }
+            />
+            <Row
+              label={t("cardType")}
+              value={
+                result.cardType ?? (
+                  <span className="muted">{t("notDetermined")}</span>
+                )
+              }
+            />
+            <Row
+              label={t("luhn")}
+              value={
+                result.luhnValid === null ? (
+                  <span className="muted">{t("tooShort")}</span>
+                ) : (
+                  <span
+                    className={
+                      result.luhnValid ? "stamp stamp-ok" : "stamp stamp-bad"
+                    }
+                  >
+                    {result.luhnValid ? t("luhnOk") : t("luhnBad")}
+                  </span>
+                )
+              }
+            />
+          </section>
         ) : (
-          <p className="muted">Введите хотя бы 6 цифр, чтобы увидеть результат.</p>
+          <p className="muted hint">{t("typeHint")}</p>
         )}
 
         <p className="disclaimer">
-          Платёжная система определяется по открытым спецификациям сетей (надёжно). Банк и
-          страна берутся из открытого community-датасета{" "}
-          <a href="https://github.com/binlist/data" target="_blank" rel="noreferrer">
+          {t("disclaimer1")}{" "}
+          <a
+            href="https://github.com/binlist/data"
+            target="_blank"
+            rel="noreferrer"
+          >
             binlist/data
           </a>{" "}
-          — официальный реестр ISO IIN закрыт и платен, поэтому это best-effort данные, а не
-          гарантированно полные.
+          {t("disclaimer2")}
         </p>
       </main>
 
       <footer>
-        {/* TODO: replace with your actual GitHub repo URL once published */}
-        <a href="https://github.com/lifeofcapo/bin-lookup" target="_blank" rel="noreferrer">
-          Исходный код на GitHub
+        <a
+          href="https://github.com/lifeofcapo/bin-lookup"
+          target="_blank"
+          rel="noreferrer"
+        >
+          {t("sourceLink")}
         </a>
       </footer>
     </div>

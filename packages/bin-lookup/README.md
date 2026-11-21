@@ -7,8 +7,11 @@ a card number or a bare 6/8-digit BIN, get back:
 - **Issuing bank** and **country**, when available in the bundled open dataset.
 - **Luhn checksum validation** of the full card number.
 
-No API key, no network request, works in Node.js, the browser, React, Vue,
-anywhere JS runs.
+No API key, no network request, works everywhere JS runs — Node.js,
+CommonJS, the browser (incl. plain `<script>` tags with no bundler), React,
+Vue, Angular, TypeScript.
+
+**[Live demo →](https://lifeofcapo.github.io/bin-lookup/)**
 
 ```bash
 npm install bin-lookup
@@ -31,6 +34,16 @@ lookup("4111 1111 1111 1111");
 // }
 ```
 
+## Usage by platform
+
+- [Node.js](./docs/node.md)
+- [CommonJS](./docs/commonjs.md)
+- [TypeScript](./docs/typescript.md)
+- [Browser / CDN (no build step)](./docs/browser-cdn.md)
+- [React](./docs/react.md)
+- [Vue](./docs/vue.md)
+- [Angular](./docs/angular.md)
+
 ## Why `scheme` and `bank` have different confidence levels
 
 This is the honest part, worth reading before you rely on this in production:
@@ -42,7 +55,7 @@ This is the honest part, worth reading before you rely on this in production:
 - **`bank` / `country`** come from a bundled, pre-built table based on the
   open, crowd-maintained [`binlist/data`](https://github.com/binlist/data)
   dataset. **The official ISO/IEC 7812 IIN registry is not public** — it is
-  licensed only to banks, processors and card networks — so *no* BIN tool,
+  licensed only to banks, processors and card networks — so _no_ BIN tool,
   free or paid, can guarantee complete, authoritative bank-level coverage.
   Treat `bank`/`country` as "best available community data", not as a
   verified bank record. `matched: false` means "no bank-level data for this
@@ -59,7 +72,7 @@ pattern. Never throws; unmatched fields come back `null`.
 ### `isValidCardNumber(input: string): boolean`
 
 `true` only if the input has at least 12 digits and passes the Luhn
-checksum. This checks *structure*, not whether the card is real or active.
+checksum. This checks _structure_, not whether the card is real or active.
 
 ### `isLuhnValid(digits: string): boolean`
 
@@ -69,6 +82,9 @@ something that isn't a full card number.
 ### `detectScheme(digits: string): CardScheme | null`
 
 Network detection only, no range-table lookup.
+
+See [`docs/typescript.md`](./docs/typescript.md) for the full exported type
+list.
 
 ## Updating the bundled data
 
