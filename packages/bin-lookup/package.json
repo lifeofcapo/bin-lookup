@@ -1,0 +1,46 @@
+{
+  "name": "bin-lookup",
+  "version": "0.1.0",
+  "description": "Offline, zero-dependency BIN/IIN lookup: card network, issuing bank and country from a card number or BIN. Works in Node.js, browsers, React, TypeScript.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "license": "MIT",
+  "keywords": [
+    "bin",
+    "iin",
+    "card",
+    "credit-card",
+    "payment",
+    "luhn",
+    "visa",
+    "mastercard",
+    "mir",
+    "offline"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "build:data": "node scripts/build-data.mjs",
+    "pretest": "tsc -p tsconfig.json --outDir .test-dist",
+    "test": "node --test .test-dist/*.test.js",
+    "posttest": "rimraf .test-dist"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "rimraf": "^6.1.4",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  }
+}
