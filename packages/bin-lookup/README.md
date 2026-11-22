@@ -1,5 +1,7 @@
 # bin-lookup
 
+> Published on npm as [`@lifeofcapo/bin-lookup`](https://www.npmjs.com/package/@lifeofcapo/bin-lookup) — the unscoped name was blocked by npm's anti-squatting check as too similar to an existing package.
+
 Offline, zero-dependency BIN/IIN lookup for JavaScript and TypeScript. Given
 a card number or a bare 6/8-digit BIN, get back:
 
@@ -14,11 +16,11 @@ Vue, Angular, TypeScript.
 **[Live demo →](https://lifeofcapo.github.io/bin-lookup/)**
 
 ```bash
-npm install bin-lookup
+npm install @lifeofcapo/bin-lookup
 ```
 
 ```ts
-import { lookup } from "bin-lookup";
+import { lookup } from "@lifeofcapo/bin-lookup";
 
 lookup("4111 1111 1111 1111");
 // {

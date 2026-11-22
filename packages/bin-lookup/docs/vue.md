@@ -5,7 +5,7 @@ Works the same in Vue 3 Composition API — wrap the call in a `computed()`:
 ```vue
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { lookup } from "bin-lookup";
+import { lookup } from "@lifeofcapo/bin-lookup";
 
 const value = ref("");
 
@@ -27,7 +27,7 @@ const result = computed(() => {
 
 ```vue
 <script>
-import { lookup } from "bin-lookup";
+import { lookup } from "@lifeofcapo/bin-lookup";
 
 export default {
   data() {

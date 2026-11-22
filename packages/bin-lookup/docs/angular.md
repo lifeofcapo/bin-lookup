@@ -5,7 +5,7 @@ register since the function has no state and no dependencies.
 
 ```ts
 import { Component } from "@angular/core";
-import { lookup, type LookupResult } from "bin-lookup";
+import { lookup, type LookupResult } from "@lifeofcapo/bin-lookup";
 
 @Component({
   selector: "app-card-lookup",
@@ -37,7 +37,7 @@ an injectable service:
 
 ```ts
 import { Injectable } from "@angular/core";
-import { lookup, type LookupResult } from "bin-lookup";
+import { lookup, type LookupResult } from "@lifeofcapo/bin-lookup";
 
 @Injectable({ providedIn: "root" })
 export class BinLookupService {

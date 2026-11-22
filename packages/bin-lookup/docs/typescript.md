@@ -3,7 +3,11 @@
 Types ship with the package — no `@types/bin-lookup` needed.
 
 ```ts
-import { lookup, type LookupResult, type CardScheme } from "bin-lookup";
+import {
+  lookup,
+  type LookupResult,
+  type CardScheme,
+} from "@lifeofcapo/bin-lookup";
 
 const result: LookupResult = lookup("4111111111111111");
 

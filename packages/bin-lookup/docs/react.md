@@ -5,7 +5,7 @@ it fits naturally into a `useMemo`:
 
 ```tsx
 import { useMemo, useState } from "react";
-import { lookup } from "bin-lookup";
+import { lookup } from "@lifeofcapo/bin-lookup";
 
 function CardLookup() {
   const [value, setValue] = useState("");

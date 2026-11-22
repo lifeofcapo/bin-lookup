@@ -1,13 +1,13 @@
 # Node.js
 
 ```bash
-npm install bin-lookup
+npm install @lifeofcapo/bin-lookup
 ```
 
 Works with native ESM (recommended, `"type": "module"` or a `.mjs` file):
 
 ```js
-import { lookup } from "bin-lookup";
+import { lookup } from "@lifeofcapo/bin-lookup";
 
 console.log(lookup("4111111111111111"));
 ```

@@ -18,13 +18,13 @@ export const DOC_PAGES: DocPage[] = [
     sections: [
       {
         heading: "Install",
-        code: "npm install bin-lookup",
+        code: "npm install @lifeofcapo/bin-lookup",
         lang: "bash",
       },
       {
         heading: "Usage (ESM)",
         body: 'Works with native ESM — a project with "type": "module" in package.json, or a .mjs file.',
-        code: `import { lookup } from "bin-lookup";\n\nconsole.log(lookup("4111111111111111"));`,
+        code: `import { lookup } from "@lifeofcapo/bin-lookup";\n\nconsole.log(lookup("4111111111111111"));`,
         lang: "js",
       },
       {
@@ -40,7 +40,7 @@ export const DOC_PAGES: DocPage[] = [
       {
         heading: "No extra configuration needed",
         body: "The package publishes both an ESM and a CommonJS build. Node resolves the right one automatically from require().",
-        code: `const { lookup, isValidCardNumber } = require("bin-lookup");\n\nconst result = lookup("4111111111111111");\nconsole.log(result.scheme); // "visa"`,
+        code: `const { lookup, isValidCardNumber } = require("@lifeofcapo/bin-lookup");\n\nconst result = lookup("4111111111111111");\nconsole.log(result.scheme); // "visa"`,
         lang: "js",
       },
       {
@@ -55,8 +55,8 @@ export const DOC_PAGES: DocPage[] = [
     sections: [
       {
         heading: "Types ship with the package",
-        body: "No @types/bin-lookup needed.",
-        code: `import { lookup, type LookupResult, type CardScheme } from "bin-lookup";\n\nconst result: LookupResult = lookup("4111111111111111");\n\nif (result.scheme) {\n  const scheme: CardScheme | string = result.scheme;\n  console.log(scheme);\n}`,
+        body: "No separate type definitions needed — types ship with the package.",
+        code: `import { lookup, type LookupResult, type CardScheme } from "@lifeofcapo/bin-lookup";\n\nconst result: LookupResult = lookup("4111111111111111");\n\nif (result.scheme) {\n  const scheme: CardScheme | string = result.scheme;\n  console.log(scheme);\n}`,
         lang: "ts",
       },
       {
@@ -72,18 +72,18 @@ export const DOC_PAGES: DocPage[] = [
       {
         heading: "No bundler, no npm install",
         body: "A plain <script> tag. The package publishes a UMD/IIFE build that registers a window.BinLookup global.",
-        code: `<script src="https://unpkg.com/bin-lookup@0.2.0/dist/index.global.js"></script>\n<script>\n  const result = BinLookup.lookup("4111111111111111");\n  console.log(result.scheme); // "visa"\n</script>`,
+        code: `<script src="https://unpkg.com/@lifeofcapo/bin-lookup@0.2.0/dist/index.global.js"></script>\n<script>\n  const result = BinLookup.lookup("4111111111111111");\n  console.log(result.scheme); // "visa"\n</script>`,
         lang: "html",
       },
       {
         heading: "Or via jsDelivr",
-        code: `<script src="https://cdn.jsdelivr.net/npm/bin-lookup@0.2.0/dist/index.global.js"></script>`,
+        code: `<script src="https://cdn.jsdelivr.net/npm/@lifeofcapo/bin-lookup@0.2.0/dist/index.global.js"></script>`,
         lang: "html",
       },
       {
         heading: "ES module, straight from a CDN",
         body: 'If your page already uses <script type="module">, import the ESM build directly — no global variable needed.',
-        code: `<script type="module">\n  import { lookup } from "https://esm.sh/bin-lookup@0.2.0";\n  console.log(lookup("4111111111111111"));\n</script>`,
+        code: `<script type="module">\n  import { lookup } from "https://esm.sh/@lifeofcapo/bin-lookup@0.2.0";\n  console.log(lookup("4111111111111111"));\n</script>`,
         lang: "html",
       },
       {
@@ -99,7 +99,7 @@ export const DOC_PAGES: DocPage[] = [
       {
         heading: "A plain, synchronous call",
         body: "lookup() has no side effects, so it fits naturally into a useMemo. No useEffect needed — there's nothing asynchronous to wait for.",
-        code: `import { useMemo, useState } from "react";\nimport { lookup } from "bin-lookup";\n\nfunction CardLookup() {\n  const [value, setValue] = useState("");\n\n  const result = useMemo(() => {\n    const digits = value.replace(/\\D/g, "");\n    return digits.length >= 6 ? lookup(value) : null;\n  }, [value]);\n\n  return (\n    <div>\n      <input value={value} onChange={(e) => setValue(e.target.value)} />\n      {result && (\n        <p>{result.scheme ?? "unknown"} · {result.bank ?? "unknown bank"}</p>\n      )}\n    </div>\n  );\n}`,
+        code: `import { useMemo, useState } from "react";\nimport { lookup } from "@lifeofcapo/bin-lookup";\n\nfunction CardLookup() {\n  const [value, setValue] = useState("");\n\n  const result = useMemo(() => {\n    const digits = value.replace(/\\D/g, "");\n    return digits.length >= 6 ? lookup(value) : null;\n  }, [value]);\n\n  return (\n    <div>\n      <input value={value} onChange={(e) => setValue(e.target.value)} />\n      {result && (\n        <p>{result.scheme ?? "unknown"} · {result.bank ?? "unknown bank"}</p>\n      )}\n    </div>\n  );\n}`,
         lang: "tsx",
       },
       {
@@ -114,12 +114,12 @@ export const DOC_PAGES: DocPage[] = [
     sections: [
       {
         heading: "Composition API",
-        code: `<script setup lang="ts">\nimport { ref, computed } from "vue";\nimport { lookup } from "bin-lookup";\n\nconst value = ref("");\n\nconst result = computed(() => {\n  const digits = value.value.replace(/\\D/g, "");\n  return digits.length >= 6 ? lookup(value.value) : null;\n});\n</script>\n\n<template>\n  <input v-model="value" />\n  <p v-if="result">{{ result.scheme ?? "unknown" }} · {{ result.bank ?? "unknown bank" }}</p>\n</template>`,
+        code: `<script setup lang="ts">\nimport { ref, computed } from "vue";\nimport { lookup } from "@lifeofcapo/bin-lookup";\n\nconst value = ref("");\n\nconst result = computed(() => {\n  const digits = value.value.replace(/\\D/g, "");\n  return digits.length >= 6 ? lookup(value.value) : null;\n});\n</script>\n\n<template>\n  <input v-model="value" />\n  <p v-if="result">{{ result.scheme ?? "unknown" }} · {{ result.bank ?? "unknown bank" }}</p>\n</template>`,
         lang: "vue",
       },
       {
         heading: "Options API",
-        code: `<script>\nimport { lookup } from "bin-lookup";\n\nexport default {\n  data() {\n    return { value: "" };\n  },\n  computed: {\n    result() {\n      const digits = this.value.replace(/\\D/g, "");\n      return digits.length >= 6 ? lookup(this.value) : null;\n    },\n  },\n};\n</script>`,
+        code: `<script>\nimport { lookup } from "@lifeofcapo/bin-lookup";\n\nexport default {\n  data() {\n    return { value: "" };\n  },\n  computed: {\n    result() {\n      const digits = this.value.replace(/\\D/g, "");\n      return digits.length >= 6 ? lookup(this.value) : null;\n    },\n  },\n};\n</script>`,
         lang: "vue",
       },
       {
@@ -135,13 +135,13 @@ export const DOC_PAGES: DocPage[] = [
       {
         heading: "Call it directly from a component",
         body: "No service or module to register — the function has no state and no dependencies.",
-        code: `import { Component } from "@angular/core";\nimport { lookup, type LookupResult } from "bin-lookup";\n\n@Component({\n  selector: "app-card-lookup",\n  standalone: true,\n  template: \`\n    <input [(ngModel)]="value" (ngModelChange)="onChange($event)" />\n    <p *ngIf="result">{{ result.scheme ?? "unknown" }} · {{ result.bank ?? "unknown bank" }}</p>\n  \`,\n})\nexport class CardLookupComponent {\n  value = "";\n  result: LookupResult | null = null;\n\n  onChange(value: string) {\n    const digits = value.replace(/\\D/g, "");\n    this.result = digits.length >= 6 ? lookup(value) : null;\n  }\n}`,
+        code: `import { Component } from "@angular/core";\nimport { lookup, type LookupResult } from "@lifeofcapo/bin-lookup";\n\n@Component({\n  selector: "app-card-lookup",\n  standalone: true,\n  template: \`\n    <input [(ngModel)]="value" (ngModelChange)="onChange($event)" />\n    <p *ngIf="result">{{ result.scheme ?? "unknown" }} · {{ result.bank ?? "unknown bank" }}</p>\n  \`,\n})\nexport class CardLookupComponent {\n  value = "";\n  result: LookupResult | null = null;\n\n  onChange(value: string) {\n    const digits = value.replace(/\\D/g, "");\n    this.result = digits.length >= 6 ? lookup(value) : null;\n  }\n}`,
         lang: "ts",
       },
       {
         heading: "If you prefer a service wrapper",
         body: "Not required, but if your style guide wants external calls behind an injectable service:",
-        code: `import { Injectable } from "@angular/core";\nimport { lookup, type LookupResult } from "bin-lookup";\n\n@Injectable({ providedIn: "root" })\nexport class BinLookupService {\n  lookup(input: string): LookupResult {\n    return lookup(input);\n  }\n}`,
+        code: `import { Injectable } from "@angular/core";\nimport { lookup, type LookupResult } from "@lifeofcapo/bin-lookup";\n\n@Injectable({ providedIn: "root" })\nexport class BinLookupService {\n  lookup(input: string): LookupResult {\n    return lookup(input);\n  }\n}`,
         lang: "ts",
       },
     ],

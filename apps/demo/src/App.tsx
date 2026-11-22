@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { lookup, type LookupResult } from "bin-lookup";
+import { lookup, type LookupResult } from "@lifeofcapo/bin-lookup";
 import { useLanguage } from "./LanguageContext.js";
 import DocsPage from "./DocsPage.js";
 

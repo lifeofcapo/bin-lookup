@@ -5,7 +5,7 @@ CommonJS build, and Node resolves the right one automatically from
 `require()`:
 
 ```js
-const { lookup, isValidCardNumber } = require("bin-lookup");
+const { lookup, isValidCardNumber } = require("@lifeofcapo/bin-lookup");
 
 const result = lookup("4111111111111111");
 console.log(result.scheme); // "visa"

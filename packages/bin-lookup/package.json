@@ -1,6 +1,9 @@
 {
-  "name": "bin-lookup",
+  "name": "@lifeofcapo/bin-lookup",
   "version": "0.2.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Offline, zero-dependency BIN/IIN lookup: card network, issuing bank and country from a card number or BIN. Works in Node.js, browsers, React, TypeScript.",
   "type": "module",
   "main": "./dist/index.cjs",
