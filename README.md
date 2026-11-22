@@ -20,17 +20,3 @@ curl -L -o packages/bin-lookup/scripts/ranges.raw.csv \
 npm run build:data
 npm run build
 ```
-
-## Publishing
-
-```bash
-cd packages/bin-lookup
-npm run build
-npm publish --access public
-```
-
-## Deploying the demo
-
-Push to `main` — `.github/workflows/deploy-demo.yml` builds `apps/demo` and
-publishes it to GitHub Pages automatically. Enable Pages once in the repo
-settings (Settings → Pages → Source: GitHub Actions).

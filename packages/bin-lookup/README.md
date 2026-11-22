@@ -52,14 +52,19 @@ This is the honest part, worth reading before you rely on this in production:
   Mastercard, Mir, Amex and friends publish their number ranges publicly, so
   detecting the network is pure, deterministic pattern matching
   (`schemeSource: "pattern"`), independent of any database.
-- **`bank` / `country`** come from a bundled, pre-built table based on the
-  open, crowd-maintained [`binlist/data`](https://github.com/binlist/data)
-  dataset. **The official ISO/IEC 7812 IIN registry is not public** — it is
-  licensed only to banks, processors and card networks — so _no_ BIN tool,
-  free or paid, can guarantee complete, authoritative bank-level coverage.
-  Treat `bank`/`country` as "best available community data", not as a
-  verified bank record. `matched: false` means "no bank-level data for this
-  BIN", not "invalid card".
+- **`bank` / `country`** come from a bundled table merged from two open,
+  crowd-maintained datasets: [`binlist/data`](https://github.com/binlist/data)
+  (broad global coverage, CC-BY-style open data) and
+  [`banks-db`](https://github.com/ramoona/banks-db) (CC-BY-4.0, much stronger
+  coverage of Russian/CIS banks and the Mir network, which `binlist/data`
+  barely covers). **The official ISO/IEC 7812 IIN registry is not public** —
+  it is licensed only to banks, processors and card networks — so _no_ BIN
+  tool, free or paid, can guarantee complete, authoritative bank-level
+  coverage. Even combined, these two sources don't cover every issued BIN
+  range (new ranges are assigned continuously and not all of them reach any
+  open dataset). Treat `bank`/`country` as "best available community data",
+  not as a verified bank record. `matched: false` means "no bank-level data
+  for this BIN", not "invalid card".
 
 ## API
 
@@ -88,14 +93,20 @@ list.
 
 ## Updating the bundled data
 
-The shipped dataset is generated from `binlist/data`'s `ranges.csv` via
-`scripts/build-data.mjs`, which compiles the human-editable CSV into the
-compact, binary-searchable `src/data/ranges.json` actually shipped in the
-package:
+The shipped dataset is built by `scripts/build-data.mjs` from two sources:
+
+1. `binlist/data`'s `ranges.csv` (global coverage, incl. type/prepaid detail).
+2. `banks-db`'s per-bank JSON files (stronger RU/CIS/Mir coverage), merged in
+   without overwriting any overlapping `binlist/data` range.
 
 ```bash
 curl -L -o scripts/ranges.raw.csv \
   https://raw.githubusercontent.com/binlist/data/master/ranges.csv
+
+npm pack banks-db --pack-destination /tmp
+tar -xzf /tmp/banks-db-*.tgz -C /tmp
+rm -rf scripts/banks-db-src && cp -r /tmp/package/banks scripts/banks-db-src
+
 npm run build:data
 npm run build
 ```
@@ -103,5 +114,6 @@ npm run build
 ## License
 
 MIT for the code. Bundled BIN/bank/country data is derived from
-[`binlist/data`](https://github.com/binlist/data) — see that project for its
-data license and how to contribute corrections upstream.
+[`binlist/data`](https://github.com/binlist/data) and
+[`banks-db`](https://github.com/ramoona/banks-db) (CC-BY-4.0) — see those
+projects for their data licenses and how to contribute corrections upstream.

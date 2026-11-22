@@ -30,6 +30,8 @@ export const translations = {
     disclaimer2:
       "— the official ISO IIN registry is not public, so this is best-effort, not guaranteed-complete data.",
     sourceLink: "Source on GitHub",
+    navDemo: "Demo",
+    navDocs: "Docs",
   },
   ru: {
     title: "bin-lookup",
@@ -60,6 +62,8 @@ export const translations = {
     disclaimer2:
       "— официальный реестр ISO IIN закрыт, поэтому это best-effort данные, а не гарантированно полные.",
     sourceLink: "Исходный код на GitHub",
+    navDemo: "Демо",
+    navDocs: "Документация",
   },
 } as const satisfies Record<Lang, Record<string, string>>;
 

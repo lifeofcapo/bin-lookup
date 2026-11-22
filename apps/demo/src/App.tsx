@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { lookup, type LookupResult } from "bin-lookup";
 import { useLanguage } from "./LanguageContext.js";
+import DocsPage from "./DocsPage.js";
 
 const EXAMPLES = [
   { key: "exampleVisa", value: "4111 1111 1111 1111" },
@@ -47,9 +48,20 @@ function Row({
   );
 }
 
+function getView(): "demo" | "docs" {
+  return window.location.hash.startsWith("#docs") ? "docs" : "demo";
+}
+
 export default function App() {
   const { lang, setLang, t } = useLanguage();
   const [raw, setRaw] = useState("4111 1111 1111 1111");
+  const [view, setView] = useState(getView);
+
+  useEffect(() => {
+    const onHashChange = () => setView(getView());
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
 
   const result: LookupResult | null = useMemo(() => {
     const digits = raw.replace(/\D/g, "");
@@ -58,24 +70,44 @@ export default function App() {
   }, [raw]);
 
   return (
-    <div className="page">
+    <div className={view === "docs" ? "page page-wide" : "page"}>
       <nav className="topbar">
         <span className="wordmark">bin-lookup</span>
-        <div className="lang-switch" role="group" aria-label="Language">
-          <button
-            className={lang === "en" ? "lang-active" : ""}
-            onClick={() => setLang("en")}
-            aria-pressed={lang === "en"}
-          >
-            EN
-          </button>
-          <button
-            className={lang === "ru" ? "lang-active" : ""}
-            onClick={() => setLang("ru")}
-            aria-pressed={lang === "ru"}
-          >
-            RU
-          </button>
+        <div className="topbar-right">
+          <div className="view-switch">
+            <a
+              href="#"
+              className={
+                view === "demo" ? "view-tab view-tab-active" : "view-tab"
+              }
+            >
+              {t("navDemo")}
+            </a>
+            <a
+              href="#docs"
+              className={
+                view === "docs" ? "view-tab view-tab-active" : "view-tab"
+              }
+            >
+              {t("navDocs")}
+            </a>
+          </div>
+          <div className="lang-switch" role="group" aria-label="Language">
+            <button
+              className={lang === "en" ? "lang-active" : ""}
+              onClick={() => setLang("en")}
+              aria-pressed={lang === "en"}
+            >
+              EN
+            </button>
+            <button
+              className={lang === "ru" ? "lang-active" : ""}
+              onClick={() => setLang("ru")}
+              aria-pressed={lang === "ru"}
+            >
+              RU
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -84,102 +116,106 @@ export default function App() {
         <p className="subtitle">{t("subtitle")}</p>
       </header>
 
-      <main>
-        <label htmlFor="pan">{t("inputLabel")}</label>
-        <input
-          id="pan"
-          inputMode="numeric"
-          autoComplete="off"
-          spellCheck={false}
-          value={raw}
-          onChange={(e) => setRaw(formatInput(e.target.value))}
-          placeholder={t("placeholder")}
-        />
+      {view === "docs" ? (
+        <DocsPage />
+      ) : (
+        <main>
+          <label htmlFor="pan">{t("inputLabel")}</label>
+          <input
+            id="pan"
+            inputMode="numeric"
+            autoComplete="off"
+            spellCheck={false}
+            value={raw}
+            onChange={(e) => setRaw(formatInput(e.target.value))}
+            placeholder={t("placeholder")}
+          />
 
-        <div className="examples">
-          {EXAMPLES.map((ex) => (
-            <button key={ex.value} onClick={() => setRaw(ex.value)}>
-              {t(ex.key)}
-            </button>
-          ))}
-        </div>
+          <div className="examples">
+            {EXAMPLES.map((ex) => (
+              <button key={ex.value} onClick={() => setRaw(ex.value)}>
+                {t(ex.key)}
+              </button>
+            ))}
+          </div>
 
-        {result ? (
-          <section className="receipt" aria-live="polite">
-            <Row
-              label={t("scheme")}
-              value={
-                result.scheme ? (
-                  (SCHEME_LABEL[result.scheme] ?? result.scheme)
-                ) : (
-                  <span className="muted">{t("notDetermined")}</span>
-                )
-              }
-              tag={
-                result.scheme
-                  ? result.schemeSource === "range"
-                    ? t("fromDataset")
-                    : t("byPattern")
-                  : undefined
-              }
-            />
-            <Row
-              label={t("bank")}
-              value={
-                result.bank ?? (
-                  <span className="muted">{t("noDataForBin")}</span>
-                )
-              }
-            />
-            <Row
-              label={t("country")}
-              value={
-                result.country ?? (
-                  <span className="muted">{t("noDataForBin")}</span>
-                )
-              }
-            />
-            <Row
-              label={t("cardType")}
-              value={
-                result.cardType ?? (
-                  <span className="muted">{t("notDetermined")}</span>
-                )
-              }
-            />
-            <Row
-              label={t("luhn")}
-              value={
-                result.luhnValid === null ? (
-                  <span className="muted">{t("tooShort")}</span>
-                ) : (
-                  <span
-                    className={
-                      result.luhnValid ? "stamp stamp-ok" : "stamp stamp-bad"
-                    }
-                  >
-                    {result.luhnValid ? t("luhnOk") : t("luhnBad")}
-                  </span>
-                )
-              }
-            />
-          </section>
-        ) : (
-          <p className="muted hint">{t("typeHint")}</p>
-        )}
+          {result ? (
+            <section className="receipt" aria-live="polite">
+              <Row
+                label={t("scheme")}
+                value={
+                  result.scheme ? (
+                    (SCHEME_LABEL[result.scheme] ?? result.scheme)
+                  ) : (
+                    <span className="muted">{t("notDetermined")}</span>
+                  )
+                }
+                tag={
+                  result.scheme
+                    ? result.schemeSource === "range"
+                      ? t("fromDataset")
+                      : t("byPattern")
+                    : undefined
+                }
+              />
+              <Row
+                label={t("bank")}
+                value={
+                  result.bank ?? (
+                    <span className="muted">{t("noDataForBin")}</span>
+                  )
+                }
+              />
+              <Row
+                label={t("country")}
+                value={
+                  result.country ?? (
+                    <span className="muted">{t("noDataForBin")}</span>
+                  )
+                }
+              />
+              <Row
+                label={t("cardType")}
+                value={
+                  result.cardType ?? (
+                    <span className="muted">{t("notDetermined")}</span>
+                  )
+                }
+              />
+              <Row
+                label={t("luhn")}
+                value={
+                  result.luhnValid === null ? (
+                    <span className="muted">{t("tooShort")}</span>
+                  ) : (
+                    <span
+                      className={
+                        result.luhnValid ? "stamp stamp-ok" : "stamp stamp-bad"
+                      }
+                    >
+                      {result.luhnValid ? t("luhnOk") : t("luhnBad")}
+                    </span>
+                  )
+                }
+              />
+            </section>
+          ) : (
+            <p className="muted hint">{t("typeHint")}</p>
+          )}
 
-        <p className="disclaimer">
-          {t("disclaimer1")}{" "}
-          <a
-            href="https://github.com/binlist/data"
-            target="_blank"
-            rel="noreferrer"
-          >
-            binlist/data
-          </a>{" "}
-          {t("disclaimer2")}
-        </p>
-      </main>
+          <p className="disclaimer">
+            {t("disclaimer1")}{" "}
+            <a
+              href="https://github.com/binlist/data"
+              target="_blank"
+              rel="noreferrer"
+            >
+              binlist/data
+            </a>{" "}
+            {t("disclaimer2")}
+          </p>
+        </main>
+      )}
 
       <footer>
         <a
