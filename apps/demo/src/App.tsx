@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { lookup, type LookupResult } from "@lifeofcapo/bin-lookup";
 import { useLanguage } from "./LanguageContext.js";
 import DocsPage from "./DocsPage.js";
+import SchemeIcon from "./SchemeIcon.js";
 
 const EXAMPLES = [
   { key: "exampleVisa", value: "4111 1111 1111 1111" },
@@ -69,6 +70,9 @@ export default function App() {
     return lookup(raw);
   }, [raw]);
 
+  const digitsLen = raw.replace(/\D/g, "").length;
+  const cardGlow = result?.scheme ? `glow-${result.scheme}` : "";
+
   return (
     <div className={view === "docs" ? "page page-wide" : "page"}>
       <nav className="topbar">
@@ -120,16 +124,96 @@ export default function App() {
         <DocsPage />
       ) : (
         <main>
-          <label htmlFor="pan">{t("inputLabel")}</label>
-          <input
-            id="pan"
-            inputMode="numeric"
-            autoComplete="off"
-            spellCheck={false}
-            value={raw}
-            onChange={(e) => setRaw(formatInput(e.target.value))}
-            placeholder={t("placeholder")}
-          />
+          <div className={`credit-card ${cardGlow}`}>
+            <div className="credit-card-mesh" aria-hidden="true" />
+
+            <div className="credit-card-top">
+              <span className="credit-card-brand" aria-hidden="true">
+                <svg viewBox="0 0 24 24" className="credit-card-brand-mark">
+                  <g
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                    strokeLinecap="round"
+                  >
+                    <path d="M12 2v20M2 12h20M5 5l14 14M19 5L5 19" />
+                  </g>
+                </svg>
+              </span>
+
+              <span className="credit-card-nfc" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <g
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                  >
+                    <path d="M8 5.5a11 11 0 0 1 0 13" opacity="0.45" />
+                    <path d="M11.3 8a7 7 0 0 1 0 8" opacity="0.7" />
+                    <path d="M14.6 10.3a3.3 3.3 0 0 1 0 3.4" />
+                  </g>
+                </svg>
+              </span>
+
+              <span className="credit-card-scheme">
+                <SchemeIcon scheme={result?.scheme} bare />
+              </span>
+            </div>
+
+            <div className="credit-card-number-row">
+              <span className="credit-card-number-label">
+                {t("inputLabel")}
+              </span>
+              <div className="credit-card-number">
+                <span className="credit-card-number-display" aria-hidden="true">
+                  {raw || t("placeholder")}
+                </span>
+                <input
+                  id="pan"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  spellCheck={false}
+                  value={raw}
+                  onChange={(e) => setRaw(formatInput(e.target.value))}
+                  placeholder={t("placeholder")}
+                  className="credit-card-number-input"
+                  aria-label={t("inputLabel")}
+                />
+              </div>
+            </div>
+
+            <div className="credit-card-bottom">
+              <span className="credit-card-chip" aria-hidden="true">
+                <svg viewBox="0 0 32 24">
+                  <rect
+                    x="0.5"
+                    y="0.5"
+                    width="31"
+                    height="23"
+                    rx="4"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                  />
+                  <path
+                    d="M11 0.5V23.5M21 0.5V23.5M0.5 8H31.5M0.5 16H31.5M11 12H21"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                  />
+                </svg>
+              </span>
+
+              <span className="credit-card-status">
+                {digitsLen === 0
+                  ? t("typeHint")
+                  : result?.scheme
+                    ? (SCHEME_LABEL[result.scheme] ?? result.scheme)
+                    : digitsLen < 6
+                      ? t("tooShort")
+                      : t("notDetermined")}
+              </span>
+            </div>
+          </div>
 
           <div className="examples">
             {EXAMPLES.map((ex) => (
@@ -199,9 +283,7 @@ export default function App() {
                 }
               />
             </section>
-          ) : (
-            <p className="muted hint">{t("typeHint")}</p>
-          )}
+          ) : null}
 
           <p className="disclaimer">
             {t("disclaimer1")}{" "}

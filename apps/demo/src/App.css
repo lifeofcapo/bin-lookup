@@ -1,30 +1,39 @@
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
 
 :root {
-  --paper: #faf9f6;
+  --bg: #08090b;
+  --panel: #111316;
+  --panel-soft: #15181c;
+  --ink: #f2f3f5;
+  --ink-soft: #8b909a;
+  --ink-faint: #5b6068;
+  --rule: #23262b;
+  --accent: #35e0a8;
+  --accent-ink: #06130f;
+  --accent-dim: #1d4f41;
+  --bad: #ef6a5a;
+  --ok-bg: rgba(53, 224, 168, 0.12);
+  --bad-bg: rgba(239, 106, 90, 0.12);
+  color-scheme: dark;
+}
+
+/* Site is dark-by-default to match the reference design, but still
+   respects an explicit light override if one is ever added. */
+:root[data-theme="light"] {
+  --bg: #faf9f6;
+  --panel: #ffffff;
+  --panel-soft: #f3f2ee;
   --ink: #111110;
   --ink-soft: #6b685f;
-  --rule: #dddad0;
-  --accent: #96730f;
+  --ink-faint: #9b9789;
+  --rule: #e3e0d6;
+  --accent: #0f9d6b;
   --accent-ink: #faf9f6;
+  --accent-dim: #c9e9dc;
   --bad: #9c2b1f;
   --ok-bg: #eef1e4;
   --bad-bg: #f3e6e2;
   color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --paper: #0d0c0a;
-    --ink: #f2f0e9;
-    --ink-soft: #948f80;
-    --rule: #2a2822;
-    --accent: #d4a62b;
-    --accent-ink: #0d0c0a;
-    --ok-bg: #1b2015;
-    --bad-bg: #241512;
-    color-scheme: dark;
-  }
 }
 
 * {
@@ -34,12 +43,20 @@
 html,
 body {
   margin: 0;
-  background: var(--paper);
+  background: var(--bg);
   color: var(--ink);
 }
 
 body {
   font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  background:
+    radial-gradient(
+      620px circle at 50% -60px,
+      rgba(53, 224, 168, 0.14),
+      transparent 60%
+    ),
+    var(--bg);
+  background-attachment: fixed;
 }
 
 .page {
@@ -64,8 +81,9 @@ body {
 .lang-switch {
   display: flex;
   border: 1px solid var(--rule);
-  border-radius: 6px;
+  border-radius: 7px;
   overflow: hidden;
+  background: var(--panel);
 }
 
 .lang-switch button {
@@ -83,8 +101,8 @@ body {
 }
 
 .lang-switch .lang-active {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--accent);
+  color: var(--accent-ink);
 }
 
 .hero {
@@ -94,7 +112,7 @@ body {
 
 h1 {
   font-size: 2.25rem;
-  font-weight: 600;
+  font-weight: 700;
   margin: 0 0 14px;
   letter-spacing: -0.03em;
 }
@@ -110,39 +128,242 @@ main {
   padding-top: 32px;
 }
 
-label {
-  display: block;
-  font-size: 0.8rem;
+/* --- Visual card input: a literal plastic-card mockup ----------------- */
+
+.credit-card-label {
+  font-size: 0.78rem;
   color: var(--ink-soft);
-  margin-bottom: 10px;
+  display: block;
+  margin-bottom: 12px;
 }
 
-input {
+.credit-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  font-size: 1.3rem;
+  max-width: 400px;
+  aspect-ratio: 1.586 / 1;
+  margin: 0 auto;
+  border-radius: 20px;
+  overflow: hidden;
+  isolation: isolate;
+  background: #0c1210;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 30px 60px -28px rgba(0, 0, 0, 0.65);
+  transition: box-shadow 0.3s ease;
+}
+
+/* Default mesh: a soft diagonal blue → green blob, matching an
+   undetermined / fresh-start card. Each scheme below recolors it. */
+.credit-card-mesh {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      55% 70% at 72% 45%,
+      color-mix(in srgb, var(--card-mesh-2, #35e0a8) 55%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      45% 65% at 32% 40%,
+      color-mix(in srgb, var(--card-mesh-1, #3a6df0) 55%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(155deg, #0a1512 0%, #081210 60%, #061008 100%);
+  filter: blur(0.5px);
+  transition: background 0.4s ease;
+}
+
+.credit-card.glow-visa {
+  --card-mesh-1: #2d4bd6;
+  --card-mesh-2: #5b7cfa;
+}
+.credit-card.glow-mastercard {
+  --card-mesh-1: #c7260f;
+  --card-mesh-2: #f7a81b;
+}
+.credit-card.glow-amex {
+  --card-mesh-1: #0f4e8c;
+  --card-mesh-2: #4e9fe0;
+}
+.credit-card.glow-mir {
+  --card-mesh-1: #0b5c3a;
+  --card-mesh-2: #35e0a8;
+}
+.credit-card.glow-maestro {
+  --card-mesh-1: #0099df;
+  --card-mesh-2: #ed5f6b;
+}
+.credit-card.glow-discover {
+  --card-mesh-1: #3a2a0a;
+  --card-mesh-2: #f68121;
+}
+.credit-card.glow-jcb {
+  --card-mesh-1: #0e4c96;
+  --card-mesh-2: #0a8a3d;
+}
+.credit-card.glow-unionpay {
+  --card-mesh-1: #00447c;
+  --card-mesh-2: #c23b4a;
+}
+.credit-card.glow-diners {
+  --card-mesh-1: #16405c;
+  --card-mesh-2: #9ecbe8;
+}
+
+.credit-card[class*="glow-"] {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 30px 70px -26px color-mix(in srgb, var(--card-mesh-2) 55%, transparent),
+    0 30px 60px -28px rgba(0, 0, 0, 0.65);
+}
+
+.credit-card-top {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 7% 7% 0;
+}
+
+.credit-card-brand-mark {
+  width: 22px;
+  height: 22px;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.credit-card-nfc {
+  display: flex;
+  margin-left: auto;
+  width: 22px;
+  height: 22px;
+  color: rgba(255, 255, 255, 0.75);
+  transform: rotate(90deg);
+}
+
+.credit-card-nfc svg {
+  width: 100%;
+  height: 100%;
+}
+
+.credit-card-scheme {
+  display: flex;
+  align-items: center;
+  height: 26px;
+}
+
+.scheme-icon {
+  height: 100%;
+  width: auto;
+  display: block;
+}
+
+.scheme-icon-bare {
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
+}
+
+.scheme-icon-generic {
+  color: var(--ink-faint);
+}
+
+.credit-card-number-row {
+  position: relative;
+  z-index: 1;
+  padding: 7% 7% 0;
+  margin-top: 6%;
+}
+
+.credit-card-number-label {
+  display: block;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 6px;
+}
+
+.credit-card-number {
+  position: relative;
+}
+
+.credit-card-number-display {
+  display: block;
   font-family: "IBM Plex Mono", ui-monospace, monospace;
-  letter-spacing: 0.03em;
-  padding: 16px 0;
+  font-weight: 500;
+  font-size: clamp(1.05rem, 5.2vw, 1.5rem);
+  letter-spacing: 0.05em;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+.credit-card-number-display.is-placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.credit-card-number-input {
+  position: absolute;
+  inset: -6px;
+  width: calc(100% + 12px);
+  height: calc(100% + 12px);
   border: none;
-  border-bottom: 2px solid var(--ink);
   background: transparent;
-  color: var(--ink);
+  color: transparent;
+  caret-color: #fff;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-weight: 500;
+  font-size: clamp(1.05rem, 5.2vw, 1.5rem);
+  letter-spacing: 0.05em;
+  padding: 6px 0 0;
 }
 
-input::placeholder {
-  color: var(--rule);
-}
-
-input:focus {
+.credit-card-number-input:focus {
   outline: none;
-  border-bottom-color: var(--accent);
+}
+
+.credit-card-bottom {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 7% 9%;
+  margin-top: auto;
+}
+
+.credit-card-chip {
+  width: 15%;
+  max-width: 42px;
+  aspect-ratio: 32 / 24;
+  color: rgba(255, 255, 255, 0.8);
+  flex-shrink: 0;
+}
+
+.credit-card-chip svg {
+  width: 100%;
+  height: 100%;
+}
+
+.credit-card-status {
+  font-size: 0.72rem;
+  font-family: "IBM Plex Mono", monospace;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: right;
+}
+
+.credit-card[class*="glow-"] .credit-card-status {
+  color: #fff;
 }
 
 .examples {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin: 16px 0 8px;
+  margin: 18px 0 8px;
 }
 
 .examples button {
@@ -150,8 +371,8 @@ input:focus {
   font-size: 0.72rem;
   padding: 6px 10px;
   border: 1px solid var(--rule);
-  border-radius: 4px;
-  background: transparent;
+  border-radius: 6px;
+  background: var(--panel);
   color: var(--ink-soft);
   cursor: pointer;
 }
@@ -165,15 +386,14 @@ input:focus {
   margin-top: 24px;
 }
 
-/* Receipt: hairline rows separated by a dashed tear-line, evoking a
-   terminal printout rather than a generic shadowed card. */
+/* Receipt: rows inside a rounded panel, echoing the pricing-card rhythm
+   from the reference design rather than a plain dashed list. */
 .receipt {
-  margin-top: 28px;
-  padding-top: 20px;
-  background-image: linear-gradient(to right, var(--rule) 50%, transparent 0%);
-  background-size: 10px 1px;
-  background-repeat: repeat-x;
-  background-position: top;
+  margin-top: 20px;
+  padding: 6px 18px;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  background: var(--panel);
 }
 
 .row {
@@ -181,15 +401,12 @@ input:focus {
   justify-content: space-between;
   align-items: baseline;
   gap: 16px;
-  padding: 11px 0;
-  background-image: linear-gradient(to right, var(--rule) 50%, transparent 0%);
-  background-size: 6px 1px;
-  background-repeat: repeat-x;
-  background-position: bottom;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--rule);
 }
 
 .row:last-child {
-  background-image: none;
+  border-bottom: none;
 }
 
 .row-label {
@@ -230,13 +447,12 @@ input:focus {
   font-weight: 600;
   font-size: 0.72rem;
   padding: 3px 8px;
-  border-radius: 3px;
-  transform: rotate(-2deg);
+  border-radius: 4px;
 }
 
 .stamp-ok {
   background: var(--ok-bg);
-  color: #3f6b1f;
+  color: var(--accent);
 }
 
 .stamp-bad {
@@ -272,7 +488,6 @@ footer a:hover {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  input,
   .examples button {
     transition:
       border-color 0.15s ease,
@@ -323,10 +538,12 @@ footer a:hover {
 .docs-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 18px;
-  border-bottom: 1px solid var(--rule);
-  padding-bottom: 14px;
+  gap: 6px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 6px;
   margin-bottom: 28px;
+  background: var(--panel);
 }
 
 .docs-tab {
@@ -334,7 +551,8 @@ footer a:hover {
   font-size: 0.78rem;
   color: var(--ink-soft);
   text-decoration: none;
-  padding: 4px 0;
+  padding: 6px 12px;
+  border-radius: 6px;
 }
 
 .docs-tab:hover {
@@ -342,7 +560,8 @@ footer a:hover {
 }
 
 .docs-tab-active {
-  color: var(--accent);
+  color: var(--accent-ink);
+  background: var(--accent);
 }
 
 .docs-section {
@@ -363,9 +582,9 @@ footer a:hover {
 }
 
 .docs-code {
-  background: color-mix(in srgb, var(--ink) 4%, transparent);
+  background: var(--panel);
   border: 1px solid var(--rule);
-  border-radius: 6px;
+  border-radius: 10px;
   padding: 14px 16px;
   overflow-x: auto;
   margin: 0;
